@@ -1,7 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const {spawn} = require('child_process');
+const multer  = require('multer')
 const cors = require('cors'); 
+
+const upload = multer({ dest: 'uploads/' })
 
 const app = express();
 const port = 5001;
@@ -40,6 +43,14 @@ app.post('/llm', (req, res) => {
     // send data to browser
     res.send(dataToSend);
     });
+});
+
+app.post('/llm/file', upload.single('files'), function (req, res, next) {
+    const file = req.file;
+
+    // TODO: process this file and update response
+
+    res.send('All ok!');
 });
 
 app.listen(port, () => console.log(`Express app running on port ${port}!`));

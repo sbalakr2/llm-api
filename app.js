@@ -46,11 +46,37 @@ app.post('/llm', (req, res) => {
 });
 
 app.post('/llm/file', upload.single('files'), function (req, res, next) {
+    let dataToSend;
     const file = req.file;
+    const filename = file.path;
+    const prompt = req.body.prompt;
 
-    // TODO: process this file and update response
+    console.log('prompt', prompt);
+    console.log('file', file);
 
-    res.send('All ok!');
+     // spawn new child process to call the python script
+     const python = spawn('python3', ['pdfbot.py', prompt, filename]);
+
+      // collect data from script
+    python.stdout.on('data', function (data) {
+    console.log('Pipe data from python script ...');
+    dataToSend = data.toString();
+
+    console.log(`result: ${dataToSend}`);
+
+    });
+
+    python.stderr.on('data', data => {
+        console.log(`stderr: ${data}`);
+    });
+
+    // in close event we are sure that stream from child process is closed
+    python.on('close', (code) => {
+    console.log(`child process close all stdio with code ${code}`);
+
+    // send data to browser
+    res.send(dataToSend);
+    });
 });
 
 app.listen(port, () => console.log(`Express app running on port ${port}!`));

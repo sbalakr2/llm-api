@@ -2,7 +2,7 @@ import openai
 import sys
 import ast
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 # messages = [{"role": "system", "content": "You are a helpful assistant."},]
 
